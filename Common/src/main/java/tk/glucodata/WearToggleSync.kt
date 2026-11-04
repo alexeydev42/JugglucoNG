@@ -186,9 +186,17 @@ object WearToggleSync {
         val toggles = decode(data)
         if (toggles.isEmpty()) return
         received = toggles
-        apply(toggles.filter { it.scope == SCOPE_PREF })
+        apply(watchApplicableState(toggles))
         UiRefreshBus.requestStatusRefresh()
     }
+
+    /**
+     * Phone-owned state that may be mirrored onto a companion watch.
+     * Alert configuration is deliberately excluded so the watch can keep its
+     * own enabled state, thresholds, sound and vibration.
+     */
+    internal fun watchApplicableState(toggles: List<Toggle>): List<Toggle> =
+        toggles.filter { it.scope == SCOPE_PREF }
 
     /**
      * Watch: asks the phone to flip one switch. The local view updates only
