@@ -25,6 +25,19 @@ class WearToggleSyncTests {
     }
 
     @Test
+    fun watchKeepsAlertConfigurationLocal() {
+        val incoming = listOf(
+            toggle(WearToggleSync.SCOPE_ALERT, "0", false),
+            toggle(WearToggleSync.SCOPE_PREF, "prediction", true),
+        )
+
+        assertEquals(
+            listOf(toggle(WearToggleSync.SCOPE_PREF, "prediction", true)),
+            WearToggleSync.watchApplicableState(incoming),
+        )
+    }
+
+    @Test
     fun anEmptyOrUnreadablePayloadYieldsNothing() {
         assertTrue(WearToggleSync.decode(null).isEmpty())
         assertTrue(WearToggleSync.decode(ByteArray(0)).isEmpty())
