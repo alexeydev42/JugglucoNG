@@ -21,6 +21,7 @@ object WearRoutes {
     const val MAIN = "main"
     const val CHART = "chart"
     const val ALERTS = "alerts"
+    const val ALERT_EDIT = "alertedit"
     const val SENSOR = "sensor"
     const val CALIBRATE = "calibrate"
     const val CALIBRATIONS = "calibrations"
