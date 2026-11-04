@@ -311,15 +311,37 @@ internal object ComplicationRenderer {
         val (bmp, canvas) = bitmap(size, size)
         val inset = size * (if (icon) ICON_INSET else PHOTO_INSET)
         val content = size - inset * 2f
-        // Value on top, arrow beneath: side by side in a round slot leaves both
-        // small, because the pair has to fit the slot's width at its narrowest.
-        val valueHeight = content * 0.60f
-        drawFittedText(canvas, text, color, inset, inset, content, valueHeight)
-        val arrowBox = content * 0.34f
+
+        // Treat the value and arrow as one visual unit. Centring each one in
+        // its own area made a compact watch-face slot look lopsided, especially
+        // for mmol/L values such as "5.4". Measure the value first, then centre
+        // the complete row inside the drawable content.
+        val rowHeight = content * 0.50f
+        val arrowBox = content * 0.30f
+        val gap = content * 0.06f
+        val maxValueWidth = (content - arrowBox - gap).coerceAtLeast(content * 0.35f)
+        val valueWidth = measuredWidth(text, rowHeight).coerceAtMost(maxValueWidth)
+        val groupWidth = valueWidth + gap + arrowBox
+        val groupLeft = inset + (content - groupWidth) / 2f
+        val rowTop = inset + (content - rowHeight) / 2f
+
+        drawFittedText(
+            canvas,
+            text,
+            color,
+            groupLeft,
+            rowTop,
+            valueWidth,
+            rowHeight,
+        )
         drawArrow(
-            canvas, arrowBox, arrowBox, rate, color,
+            canvas,
+            arrowBox,
+            arrowBox,
+            rate,
+            color,
+            groupLeft + valueWidth + gap,
             inset + (content - arrowBox) / 2f,
-            inset + content - arrowBox,
         )
         return bmp
     }
