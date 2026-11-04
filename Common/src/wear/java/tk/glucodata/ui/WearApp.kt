@@ -21,6 +21,7 @@ object WearRoutes {
     const val MAIN = "main"
     const val CHART = "chart"
     const val ALERTS = "alerts"
+    const val ALERT_EDIT = "alertedit"
     const val SENSOR = "sensor"
     const val CALIBRATE = "calibrate"
     const val CALIBRATIONS = "calibrations"
@@ -111,7 +112,24 @@ fun WearApp() {
                     },
                 )
             }
-            composable(WearRoutes.ALERTS) { AlertsScreen() }
+            composable(WearRoutes.ALERTS) {
+                AlertsScreen(
+                    onEditAlert = { type ->
+                        navController.navigate("${WearRoutes.ALERT_EDIT}?id=${type.id}")
+                    },
+                )
+            }
+            composable(
+                route = "${WearRoutes.ALERT_EDIT}?id={id}",
+                arguments = listOf(
+                    androidx.navigation.navArgument("id") { defaultValue = "-1" },
+                ),
+            ) { entry ->
+                tk.glucodata.ui.screens.AlertEditScreen(
+                    typeId = entry.arguments?.getString("id")?.toIntOrNull() ?: -1,
+                    onDone = { navController.popBackStack() },
+                )
+            }
             composable(WearRoutes.SENSOR) {
                 SensorScreen(onCalibrate = { navController.navigate(WearRoutes.CALIBRATE) })
             }

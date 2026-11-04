@@ -172,15 +172,21 @@ object WearToggleSync {
     fun knownEnabled(scope: String, id: String): Boolean? =
         received.firstOrNull { it.scope == scope && it.id == id }?.enabled
 
-    /** Watch: remembers what the phone reported, and applies what is local. */
+    /**
+     * Watch: remembers what the phone reported and applies phone-owned display
+     * preferences. Alert configuration is intentionally local to the watch:
+     * its enabled state, thresholds, sound and vibration must not be replaced
+     * by the phone during reconnect or periodic sync.
+     *
+     * SCOPE_ALERT remains in the wire format for compatibility with older Wear
+     * builds, which still treat the phone as the alert authority.
+     */
     @JvmStatic
     fun onState(data: ByteArray?) {
         val toggles = decode(data)
         if (toggles.isEmpty()) return
         received = toggles
-        // Alerts fire on the watch too, and the display preferences are read
-        // there, so both have to be written locally from the reply.
-        apply(toggles.filter { it.scope == SCOPE_ALERT || it.scope == SCOPE_PREF })
+        apply(toggles.filter { it.scope == SCOPE_PREF })
         UiRefreshBus.requestStatusRefresh()
     }
 
